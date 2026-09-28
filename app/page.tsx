@@ -26,6 +26,9 @@ const skills = [
   { label: 'System Design', value: '91%', icon: siDiagramsdotnet },
   { label: 'Docker', value: '86%', icon: siDocker },
   { label: 'Kubernetes', value: '85%', icon: siGooglecloud },
+  { label: 'CI/CD', value: '87%', icon: siDiagramsdotnet },
+
+
 
 ];
 
