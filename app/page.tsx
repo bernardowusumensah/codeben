@@ -25,6 +25,8 @@ const skills = [
   { label: 'AWS / Cloud', value: '88%', icon: siGooglecloud },
   { label: 'System Design', value: '91%', icon: siDiagramsdotnet },
   { label: 'Docker', value: '86%', icon: siDocker },
+  { label: 'Kubernetes', value: '85%', icon: siGooglecloud },
+
 ];
 
 const projects = [
