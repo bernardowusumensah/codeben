@@ -70,6 +70,16 @@ const projects = [
     result: 'Real-time environmental insights',
     tags: [],
   },
+  {
+    title: 'IDClear',
+    category: 'Identity Verification Platform',
+    link: 'https://idclearapp.com/',
+    image: '/idclear.png',
+    description:
+      'Identity verification platform for Ghana Card, passport, and DVLA licence checks, combining document authenticity, OCR and MRZ validation, optional chip authentication, face liveness, and human review into one verification pipeline.',
+    result: 'Fast, evidence-based verification',
+    tags: [],
+  },
 ];
 
 const experience = [
