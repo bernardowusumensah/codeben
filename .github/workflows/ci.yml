@@ -74,7 +74,7 @@ jobs:
           script: |
             echo "Deploying application..."
 
-            cd /home/ubuntu/codeben
+            cd /var/www/codeben
 
             echo "Pulling latest code..."
             git pull origin main
