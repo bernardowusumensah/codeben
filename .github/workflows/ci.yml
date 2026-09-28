@@ -74,7 +74,7 @@ jobs:
           script: |
             echo "Deploying application..."
 
-            cd /home/ubuntu/my-node-app
+            cd /home/ubuntu/codeben
 
             echo "Pulling latest code..."
             git pull origin main
@@ -86,4 +86,4 @@ jobs:
             npm run build
 
             echo "Restarting application..."
-            pm2 restart my-node-app || pm2 start npm --name "my-node-app" -- start
+            pm2 restart codeben || pm2 start npm --name "codeben" -- start
