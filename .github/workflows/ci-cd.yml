@@ -1,43 +1,30 @@
-name : setup and Build a Node App
+name: Setup and Build a Node App
 
-on :
-    push:
-       branches:
-         - development
+on:
+  push:
+    branches:
+      - development
 
-    pull_request: 
-        branches:
-          - development
-
+  pull_request:
+    branches:
+      - development
 
 jobs:
-    ci:
-       name: build
-       runs-on: ubuntu-latest
-    
-       steps:
-         - name: checkout
-           uses: actions/checkout@v4
+  ci:
+    name: Build
+    runs-on: ubuntu-latest
 
-         - name: NodeSetUp
-           uses: actions/setup-node@v4
-           with: 
-            node-version: 22
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
 
-         - name: Install Dependencies
-           run: npm ci
-           
-         - name: build
-           run: npm run build
+      - name: Node Setup
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
 
-         
+      - name: Install Dependencies
+        run: npm ci
 
-
-
-     
-
-	  
-
-
-
-          
+      - name: Build
+        run: npm run build
