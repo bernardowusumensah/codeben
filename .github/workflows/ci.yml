@@ -39,21 +39,51 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Development
-        uses: actions/checkout@v4
+    - name: Checkout Development
+      uses: actions/checkout@v4
+      with:
+        ref: development
+        fetch-depth: 0
+
+    - name: Promote to Main
+      run: |
+        git config user.name "github-actions[bot]"
+        git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+        git fetch origin main
+
+        git checkout main
+
+        git merge development --ff-only
+
+        git push origin main
+
+  deploy:
+    name: Deploy to EC2
+    needs: promote
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@v1
         with:
-          ref: development
-          fetch-depth: 0
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            echo "Deploying application..."
 
-      - name: Promote to Main
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            cd /home/ubuntu/my-node-app
 
-          git fetch origin main
+            echo "Pulling latest code..."
+            git pull origin main
 
-          git checkout main
+            echo "Installing dependencies..."
+            npm ci
 
-          git merge development --ff-only
+            echo "Building application..."
+            npm run build
 
-          git push origin main
+            echo "Restarting application..."
+            pm2 restart my-node-app || pm2 start npm --name "my-node-app" -- start
