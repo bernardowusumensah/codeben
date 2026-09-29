@@ -71,7 +71,7 @@ jobs:
 
       - name: Build Docker Image
         run: |
-          docker build -t ${{ secrets.SSH_DOCKER_USERNAME }}/codeben:latest .
+          docker build  -f Dockerfile -t ${{ secrets.SSH_DOCKER_USERNAME }}/codeben:latest .
 
       - name: Push Docker Image
         run: |
