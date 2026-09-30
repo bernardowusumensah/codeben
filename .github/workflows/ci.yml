@@ -119,18 +119,31 @@ jobs:
       # --------------------------------------
       # Deploy Docker Container to EC2
       # --------------------------------------
+      
+      # --------------------------------------
+      # Deploy to EC2
+      # --------------------------------------
       - name: Deploy to EC2
         uses: appleboy/ssh-action@v1
+        env:
+          DOCKER_USERNAME: ${{ secrets.SSH_DOCKER_USERNAME }}
+          DOCKER_TOKEN: ${{ secrets.SSH_DOCKER_PRIVATE_KEY }}
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
+          envs: DOCKER_USERNAME,DOCKER_TOKEN
 
           script: |
+            set -e
+
             echo "Deploying application..."
 
+            echo "Logging into Docker Hub..."
+            echo "$DOCKER_TOKEN" | docker login -u "$DOCKER_USERNAME" --password-stdin
+
             echo "Pulling latest Docker image..."
-            docker pull ${{ secrets.SSH_DOCKER_USERNAME }}/codeben:latest
+            docker pull "$DOCKER_USERNAME/codeben:latest"
 
             echo "Stopping existing container..."
             docker stop codeben || true
@@ -142,7 +155,7 @@ jobs:
             docker run -d \
               --name codeben \
               -p 80:3000 \
-              ${{ secrets.SSH_DOCKER_USERNAME }}/codeben:latest
+              "$DOCKER_USERNAME/codeben:latest"
 
             echo "Deployment complete."
 
