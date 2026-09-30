@@ -79,6 +79,9 @@ jobs:
     needs: promote
     if: github.event_name == 'push'
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
 
     steps:
 
@@ -88,13 +91,14 @@ jobs:
           ref: main
 
       # --------------------------------------
-      # Login to Docker Hub
+      # Login to GitHub Container Registry
       # --------------------------------------
       - name: Docker Login
         uses: docker/login-action@v3
         with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_TOKEN }}
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       # --------------------------------------
       # Build Docker image
@@ -103,29 +107,37 @@ jobs:
         run: |
           docker build \
             -f Dockerfile \
-            -t ${{ secrets.DOCKER_USERNAME }}/codeben:latest .
+            -t ghcr.io/${{ github.repository_owner }}/codeben:latest .
 
       # --------------------------------------
-      # Push image to Docker Hub
+      # Push image to GitHub Container Registry
       # --------------------------------------
       - name: Push Docker Image
         run: |
-          docker push ${{ secrets.DOCKER_USERNAME }}/codeben:latest
+          docker push ghcr.io/${{ github.repository_owner }}/codeben:latest
 
       # --------------------------------------
       # Deploy to EC2
       # --------------------------------------
       - name: Deploy to EC2
         uses: appleboy/ssh-action@v1
+        env:
+          GHCR_USERNAME: ${{ github.actor }}
+          GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
+          envs: GHCR_USERNAME,GHCR_TOKEN
 
           script: |
             echo "Deploying application..."
 
-            docker pull ${{ secrets.DOCKER_USERNAME }}/codeben:latest
+            echo "$GHCR_TOKEN" | docker login ghcr.io -u "$GHCR_USERNAME" --password-stdin
+
+            docker pull ghcr.io/${{ github.repository_owner }}/codeben:latest
+
+            docker logout ghcr.io
 
             docker stop codeben || true
 
@@ -134,6 +146,6 @@ jobs:
             docker run -d \
               --name codeben \
               -p 80:3000 \
-              ${{ secrets.DOCKER_USERNAME }}/codeben:latest
+              ghcr.io/${{ github.repository_owner }}/codeben:latest
 
             docker ps
